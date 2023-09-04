@@ -1,12 +1,11 @@
 const { Client, GatewayIntentBits, Message } = require("discord.js");
 const axios = require("axios");
+// const env =require('dotenv')
 const fs = require("fs");
-
-const TOKEN =
-  "MTE0ODMxNzQzNDYzODUxMjM0Mw.Gpn2mh.YCJmDJx1m333PasmEDqeKueWoyiA7Qp8Iif2fs";
-const CHANNEL_ID =
-  "https://discord.com/channels/1148316594271957032/1148347327006904462";
-const DATA_SERVER_URL = "http://waterlevel.ie/geojson/latest/";
+require("dotenv").config();
+const TOKEN = process.env.TOKEN;
+const CHANNEL_ID = process.env.CHANNEL_ID;
+const DATA_SERVER_URL = process.env.DATA_SERVER_URL;
 const INTERVAL_TIME = 60000; // 1 minute in milliseconds
 const DATA_FILE = "data.json";
 
