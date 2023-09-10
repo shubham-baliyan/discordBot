@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits, Message } = require("discord.js");
+const { Client, GatewayIntentBits } = require("discord.js");
 const axios = require("axios");
 // const env =require('dotenv')
 const fs = require("fs");
@@ -10,7 +10,11 @@ const INTERVAL_TIME = 60000; // 1 minute in milliseconds
 const DATA_FILE = "data.json";
 
 const client = new Client({
-  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages],
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+  ],
 });
 
 client.once("ready", () => {
@@ -32,7 +36,6 @@ client.once("ready", () => {
 
 client.on("messageCreate", async (message) => {
   const content = message.content.toLowerCase();
-  console.log("message create", message);
 
   if (content.startsWith("!setdata ")) {
     const dataToRemember = content.replace("!setdata ", "");
@@ -50,11 +53,20 @@ client.on("messageCreate", async (message) => {
     try {
       const data = await fetchData();
       const savedData = JSON.parse(fs.readFileSync(DATA_FILE, "utf8"));
-      let theReadingTosend = data.find(
-        (item) => item.properties.station_ref === savedData.sensor
-      );
 
-      message.channel.send(theReadingTosend.properties);
+      let anotherReading = data.filter((item) =>
+        savedData.sensor.includes(parseInt(item.properties.station_ref))
+      );
+      anotherReading = anotherReading.filter(
+        (item) => item.properties.sensor_ref === "0001"
+      );
+      if (anotherReading.length) {
+        anotherReading.map((item) => {
+          message.channel.send(
+            `Duffy says the reading for ${item.properties.station_ref}-${item.properties.station_name} is ${item.properties.value}`
+          );
+        });
+      } else message.channel.send(`Coundn't find it duffy`);
     } catch (error) {
       console.error("Error fetching data:", error);
       message.channel.send("Failed to fetch data.");
